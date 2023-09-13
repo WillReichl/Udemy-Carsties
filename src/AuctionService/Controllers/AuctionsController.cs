@@ -39,6 +39,9 @@ public class AuctionsController : ControllerBase
             .Include(auction => auction.Item)
             .FirstOrDefaultAsync(auction => auction.Id == id);
 
+        if (auction == null) 
+            return NotFound();
+        
         return _mapper.Map<AuctionDto>(auction);
     }
 
@@ -61,5 +64,49 @@ public class AuctionsController : ControllerBase
             nameof(GetAuctionById),
             new { auction.Id },
             _mapper.Map<AuctionDto>(auction));
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult> UpdateAuction(Guid id, UpdateAuctionDto updateAuctionDto)
+    {
+        var auction = await _context.Auctions
+            .Include(auction => auction.Item)
+            .FirstOrDefaultAsync(auction => auction.Id == id);
+
+        if (auction == null) return NotFound();
+
+        //TODO: check seller == username
+
+        auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
+        auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
+        auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
+        auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
+        auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
+
+        var isSaved = await _context.SaveChangesAsync() > 0;
+
+        if (isSaved)
+            return Ok();
+
+        return BadRequest("Problem saving changes");
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteAuction(Guid id)
+    {
+        var auction = await _context.Auctions.FindAsync(id);
+
+        if (auction == null) return NotFound();
+
+        //TODO: check seller == username
+
+        _context.Auctions.Remove(auction);
+
+        var isDeleted = await _context.SaveChangesAsync() > 0;
+
+        if (isDeleted)
+            return Ok();
+
+        return BadRequest("Could not delete auction");
     }
 }
