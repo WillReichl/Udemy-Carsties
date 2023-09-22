@@ -26,7 +26,7 @@ public class SearchController : ControllerBase
             "new" => query.Sort(item => item.Descending(item2 => item2.CreatedAt)),
             _ => query.Sort(item => item.Ascending(item2 => item2.AuctionEnd)),
         };
-        
+
         // Filtering
         query = searchParams.FilterBy switch
         {
@@ -35,17 +35,17 @@ public class SearchController : ControllerBase
                                                 item.AuctionEnd > DateTime.UtcNow),
             _ => query.Match(item => item.AuctionEnd > DateTime.UtcNow),
         };
-        
+
         if (!string.IsNullOrEmpty(searchParams.Seller))
         {
             query.Match(item => item.Seller == searchParams.Seller);
         }
-        
+
         if (!string.IsNullOrEmpty(searchParams.Winner))
         {
             query.Match(item => item.Winner == searchParams.Winner);
         }
-        
+
         // Paging
         query.PageNumber(searchParams.PageNumber);
         query.PageSize(searchParams.PageSize);
