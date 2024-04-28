@@ -49,3 +49,49 @@ Instead of giving a username and password, we give them a key, whose permissions
 OAuth 2.0 provides a key, but does not provide any information about the logged in user.
 
 OpenId Connect (OIDC) gives the client additional information about the user.
+
+## Section 6 - Adding a Gateway Service
+
+### Introduction
+
+We will be using Microsoft's YARP (Yet Another Reverse Proxy) for this.
+
+#### What is a Reverse Proxy?
+
+Normal request:
+
+`Client => Proxy => Internet => Destination`
+
+A reverse proxy is on the destination side. It takes the request from the internet and determines what destination to route it to.
+
+#### Do we Need a Reverse Proxy?
+
+* Typical in Microservices
+* Single surface area for requests - do not need to know individual service endpoints
+* Client unaware of any internal services
+* Security
+* SSL Termination
+* URL rewriting 
+* _Can_ be used for Load Balancing
+* Caching
+
+### Adding the Gateway Service
+
+#### Create the Project
+
+From the root directory: 
+* `dotnet new web -o src/GatewayService`
+* `dotnet sln add src/GatewayService`
+
+#### Configuring YARP
+
+See `appSettings.Development.json`.
+
+#### Authentication
+
+[YARP authentication documentation](https://microsoft.github.io/reverse-proxy/articles/authn-authz.html)
+
+We will be using OpenId Connect, and passing the authentication cookie along to the services behind the proxy.
+
+
+
