@@ -93,5 +93,12 @@ See `appSettings.Development.json`.
 
 We will be using OpenId Connect, and passing the authentication cookie along to the services behind the proxy.
 
+### Adding a new Client to the Identity service configuration
 
+- ClientSecret
+- `AllowedGrantTypes = GrantTypes.CodeAndClientCredentials`
+  - Client can securely talk inside our network to identity inside our network without browser involvement
+  - Method would not be valid for a mobile app
+- RequirePkce = false
+  - Works for our app type
 
