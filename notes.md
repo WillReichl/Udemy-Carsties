@@ -102,3 +102,6 @@ We will be using OpenId Connect, and passing the authentication cookie along to 
 - RequirePkce = false
   - Works for our app type
 
+## Section 7: Dockerizing our Application
+
+
