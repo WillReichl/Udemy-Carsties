@@ -15,16 +15,32 @@ builder.Services.AddHttpClient<AuctionSvcHttpClient>().AddPolicyHandler(GetPolic
 builder.Services.AddMassTransit(busRegistrationConfigurator =>
 {
     busRegistrationConfigurator.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
-    busRegistrationConfigurator.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
-    busRegistrationConfigurator.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.ReceiveEndpoint("search-auction-created", e =>
+    busRegistrationConfigurator.SetEndpointNameFormatter(
+        new KebabCaseEndpointNameFormatter("search", false)
+    );
+    busRegistrationConfigurator.UsingRabbitMq(
+        (context, cfg) =>
         {
-            e.UseMessageRetry(r => r.Interval(5, 5));
-            e.ConfigureConsumer<AuctionCreatedConsumer>(context);
-        });
-        cfg.ConfigureEndpoints(context);
-    });
+            cfg.Host(
+                builder.Configuration["RabbitMq:Host"],
+                "/",
+                host =>
+                {
+                    host.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest"));
+                    host.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest"));
+                }
+            );
+            cfg.ReceiveEndpoint(
+                "search-auction-created",
+                e =>
+                {
+                    e.UseMessageRetry(r => r.Interval(5, 5));
+                    e.ConfigureConsumer<AuctionCreatedConsumer>(context);
+                }
+            );
+            cfg.ConfigureEndpoints(context);
+        }
+    );
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -58,7 +74,7 @@ app.Lifetime.ApplicationStarted.Register(async () =>
 
 app.Run();
 
-static IAsyncPolicy<HttpResponseMessage> GetPolicy()
-    => HttpPolicyExtensions
+static IAsyncPolicy<HttpResponseMessage> GetPolicy() =>
+    HttpPolicyExtensions
         .HandleTransientHttpError()
         .WaitAndRetryForeverAsync(_ => TimeSpan.FromSeconds(3));

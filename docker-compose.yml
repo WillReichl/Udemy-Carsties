@@ -21,6 +21,11 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    healthcheck:
+      test: ['CMD', 'rabbitmqctl', 'status']
+      interval: 2s
+      timeout: 3s
+      retries: 10
   auction-svc:
     image: willreichl/auction-svc:latest
     build:
@@ -35,8 +40,28 @@ services:
     ports:
       - 7001:80
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+  search-svc:
+    image: willreichl/search-svc:latest
+    build:
+      context: .
+      dockerfile: src/SearchService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMq__Host=rabbitmq
+      - ConnectionStrings__MongoDbConnection=mongodb://root:mongopw@mongodb
+      - IdentityServiceUrl=http://identity-svc
+    ports:
+      - 7002:80
+    depends_on:
+      mongodb:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 volumes:
   pgdata:
   mongodata:
