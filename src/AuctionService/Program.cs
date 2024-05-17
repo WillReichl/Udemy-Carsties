@@ -1,3 +1,4 @@
+using AuctionService;
 using AuctionService.Consumers;
 using AuctionService.Data;
 using MassTransit;
@@ -53,6 +54,7 @@ builder
         options.TokenValidationParameters.ValidateAudience = false;
         options.TokenValidationParameters.NameClaimType = "username";
     });
+builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

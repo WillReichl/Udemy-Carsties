@@ -23,7 +23,7 @@ public class AuctionRepository : IAuctionRepository
         _context.Auctions.Add(auction);
     }
 
-    public async Task<AuctionDto> GetAuctionByIdAsync(Guid id)
+    public async Task<AuctionDto> GetAuctionDtoByIdAsync(Guid id)
     {
         return await _context
             .Auctions.ProjectTo<AuctionDto>(_mapper.ConfigurationProvider)
