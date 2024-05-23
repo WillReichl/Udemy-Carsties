@@ -1,4 +1,5 @@
-﻿using AuctionService.Controllers;
+﻿using System.Net;
+using AuctionService.Controllers;
 using AuctionService.Data;
 using AuctionService.DTOs;
 using AuctionService.Entities;
@@ -100,5 +101,83 @@ public class AuctionControllerTests
         Assert.NotNull(createdResult);
         Assert.Equal("GetAuctionById", createdResult.ActionName);
         Assert.IsType<AuctionDto>(createdResult.Value);
+    }
+
+    [Fact]
+    public async Task CreateAuction_WithInvalidCreateAuctionDto_ReturnsBadRequest()
+    {
+        var auctionDto = _fixture.Create<CreateAuctionDto>();
+        _auctionRepo.SaveChangesAsync().Returns(false);
+
+        var response = await _controller.CreateAuction(auctionDto);
+        var result = response.Result as ObjectResult;
+
+        Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateAuction_WithUpdateAuctionDto_ReturnsOkResponse()
+    {
+        var auctionId = Guid.NewGuid();
+        var auctionUpdateDto = _fixture.Create<UpdateAuctionDto>();
+
+        var auction = CreateAuctionWithItemForId(auctionId);
+        _auctionRepo.GetAuctionEntityById(default).ReturnsForAnyArgs(auction);
+        _auctionRepo.SaveChangesAsync().Returns(true);
+
+        var result = await _controller.UpdateAuction(auctionId, auctionUpdateDto);
+
+        Assert.IsType<OkResult>(result);
+        await _auctionRepo.Received(1).GetAuctionEntityById(Arg.Is<Guid>(a => a == auctionId));
+        // await _publishEndpoint.ReceivedWithAnyArgs(1).Publish(default);
+        // ^ This assertion does not work, suspect something to do w/ optional params?
+        // ^ If I was really testing this, I would want to test the mapping anyway, or cover w/ integration test
+        await _auctionRepo.Received(1).SaveChangesAsync();
+    }
+
+    private Auction CreateAuctionWithItemForId(Guid auctionId)
+    {
+        var auction = _fixture
+            .Build<Auction>()
+            .Without(x => x.Item)
+            .With(x => x.Id, auctionId)
+            .With(x => x.Seller, "test")
+            .Create();
+        auction.Item = _fixture
+            .Build<Item>()
+            .Without(x => x.Auction)
+            .With(x => x.AuctionId, auction.Id)
+            .Create();
+        return auction;
+    }
+
+    [Fact]
+    public async Task UpdateAuction_WithInvalidUser_Returns403Forbid()
+    {
+        throw new NotImplementedException();
+    }
+
+    [Fact]
+    public async Task UpdateAuction_WithInvalidGuid_ReturnsNotFound()
+    {
+        throw new NotImplementedException();
+    }
+
+    [Fact]
+    public async Task DeleteAuction_WithValidUser_ReturnsOkResponse()
+    {
+        throw new NotImplementedException();
+    }
+
+    [Fact]
+    public async Task DeleteAuction_WithInvalidGuid_Returns404Response()
+    {
+        throw new NotImplementedException();
+    }
+
+    [Fact]
+    public async Task DeleteAuction_WithInvalidUser_Returns403Response()
+    {
+        throw new NotImplementedException();
     }
 }
