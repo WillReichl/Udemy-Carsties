@@ -154,30 +154,76 @@ public class AuctionControllerTests
     [Fact]
     public async Task UpdateAuction_WithInvalidUser_Returns403Forbid()
     {
-        throw new NotImplementedException();
+        // arrange
+        var auction = _fixture.Build<Auction>().Without(a => a.Item).Create();
+        auction.Seller = "not-test";
+        var updateAuctionDto = _fixture.Create<UpdateAuctionDto>();
+        _auctionRepo.GetAuctionEntityById(default).ReturnsForAnyArgs(auction);
+
+        // act
+        var result = await _controller.UpdateAuction(auction.Id, updateAuctionDto);
+
+        // assert
+        Assert.IsType<ForbidResult>(result);
     }
 
     [Fact]
     public async Task UpdateAuction_WithInvalidGuid_ReturnsNotFound()
     {
-        throw new NotImplementedException();
+        // arrange
+        var updateAuctionDto = _fixture.Create<UpdateAuctionDto>();
+        _auctionRepo.GetAuctionEntityById(default).ReturnsForAnyArgs(null as Auction);
+
+        // act
+        var result = await _controller.UpdateAuction(Guid.NewGuid(), updateAuctionDto);
+
+        // assert
+        Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact]
     public async Task DeleteAuction_WithValidUser_ReturnsOkResponse()
     {
-        throw new NotImplementedException();
+        // arrange
+        var auctionId = Guid.NewGuid();
+
+        var auction = CreateAuctionWithItemForId(auctionId);
+        _auctionRepo.GetAuctionEntityById(default).ReturnsForAnyArgs(auction);
+        _auctionRepo.SaveChangesAsync().Returns(true);
+
+        // act
+        var result = await _controller.DeleteAuction(auctionId);
+
+        // assert
+        Assert.IsType<OkResult>(result);
     }
 
     [Fact]
     public async Task DeleteAuction_WithInvalidGuid_Returns404Response()
     {
-        throw new NotImplementedException();
+        // arrange
+        var auctionId = Guid.NewGuid();
+        _auctionRepo.GetAuctionEntityById(default).ReturnsForAnyArgs(null as Auction);
+
+        // act
+        var result = await _controller.DeleteAuction(auctionId);
+
+        // assert
+        Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact]
     public async Task DeleteAuction_WithInvalidUser_Returns403Response()
     {
-        throw new NotImplementedException();
+        // arrange
+        var auction = _fixture.Build<Auction>().Without(a => a.Item).Create();
+        auction.Seller = "not-test";
+        _auctionRepo.GetAuctionEntityById(default).ReturnsForAnyArgs(auction);
+
+        // act
+        var result = await _controller.DeleteAuction(auction.Id);
+
+        // assert
+        Assert.IsType<ForbidResult>(result);
     }
 }
