@@ -141,6 +141,36 @@ we are currently developing.
 3. Build the image, e.g. `docker compose build auction-svc`
    1. Repeat this upon any changes!
 
+## Section 8: Adding the Client Side Application
+
+### BFF = Backend For Frontend
+
+- WebApp is also NextJS, typically working with React.
+- Majority of the code is prerendered server-side
+  - Good for search engine optimization
+  - Also other server-side functionality!
+
+### Why NextJS
+
+- Performance is excellent
+- Load times helped with lazy loading and pre-fetching
+- Good SEO, read HTML rather than Javascript
+- Can act as BFF for our client app
+- Can keep a secret/hides unnecessary data
+- React based
+
+### NextJS "Cons"
+
+- Opinionated
+- Routing - some do not like it
+- React based
+
+### Expectations
+
+- We will not be creating a responsive app
+- We will not be creating a native mobile app
+- We will create a desktop web app
+
 ## Appendix A: Testing
 
 ### Introduction
