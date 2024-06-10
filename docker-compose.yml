@@ -6,7 +6,8 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - /var/lib/postresql/data
+      # - pgdata:/var/lib/postgresql/data
   mongodb:
     image: mongo
     environment:
@@ -15,7 +16,8 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - mongodata:/var/lib/mongodb/data
+      - /var/lib/mongodb/data
+      # - mongodata:/var/lib/mongodb/data
   rabbitmq:
     image: rabbitmq:3-management-alpine
     ports:
@@ -55,6 +57,7 @@ services:
       - RabbitMq__Host=rabbitmq
       - ConnectionStrings__MongoDbConnection=mongodb://root:mongopw@mongodb
       - IdentityServiceUrl=http://identity-svc
+      - AuctionServiceUrl=http://auction-svc
     ports:
       - 7002:80
     depends_on:
@@ -62,6 +65,8 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+      auction-svc:
+        condition: service_started
   identity-svc:
     image: willreichl/identity-svc:latest
     build:
@@ -86,6 +91,6 @@ services:
       - ASPNETCORE_URLS=http://+:80
     ports:
       - 6001:80
-volumes:
-  pgdata:
-  mongodata:
+# volumes:
+#   pgdata:
+#   mongodata:

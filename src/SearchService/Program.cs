@@ -64,6 +64,7 @@ app.Lifetime.ApplicationStarted.Register(async () =>
 {
     try
     {
+        Console.WriteLine("Initializing database...");
         await DbInitializer.InitDb(app);
     }
     catch (Exception e)
