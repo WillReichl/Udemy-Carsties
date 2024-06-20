@@ -1,5 +1,6 @@
 {
-	"css.lint.unknownAtRules": "ignore",
-	"prettier.tabWidth": 2,
-	"prettier.useTabs": false
+  "css.lint.unknownAtRules": "ignore",
+  "prettier.tabWidth": 2,
+  "prettier.useTabs": false,
+  "editor.formatOnSave": true
 }
