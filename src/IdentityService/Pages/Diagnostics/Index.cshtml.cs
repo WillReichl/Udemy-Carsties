@@ -16,10 +16,12 @@ public class Index : PageModel
         var localAddresses = new string[]
         {
             "::ffff:172.18.0.1", // local address in docker
+            "::ffff:192.168.65.1", // local address in docker
             "127.0.0.1",
             "::1",
             HttpContext.Connection.LocalIpAddress.ToString()
         };
+        Console.WriteLine($"Current address: {HttpContext.Connection.RemoteIpAddress.ToString()}");
         if (!localAddresses.Contains(HttpContext.Connection.RemoteIpAddress.ToString()))
         {
             return NotFound();
